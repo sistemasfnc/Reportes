@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<estados>
+  <estado code="1">Transcripcion</estado>
+  <estado code="2">Liquidada</estado>
+  <estado code="3">Cuenta de cobro</estado>
+  <estado code="4">Valor pagado</estado>
+  <estado code="5">No reconocimiento</estado>
+  <estado code="6">Autorizacion</estado>
+  <estado code="7">Solicitud orden de pago</estado>
+</estados>
