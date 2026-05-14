@@ -1,0 +1,56 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Reportes.master.cs" Inherits="Reportes.Reportes" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Fundaci&oacute; Neumol&oacute;gica Colombiana</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>        
+    <link rel="stylesheet" href="~/css/style.css" type="text/css" media="all" runat="server" id="cssMain" />
+    <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.jcarousel.js"></script>
+    <script src="js/cufon-yui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/Chaparral_Pro.font.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery-func.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+    <!--[if IE 6]><link rel="stylesheet" href="css/ie.css" type="text/css" media="all" /><![endif]-->
+
+    <asp:ContentPlaceHolder ID="head" runat="server">                
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="smReportes" runat="server"></asp:ScriptManager>
+        <div id="header">
+            <div class="shell"></div>
+        </div>
+        <div id="navigation">
+            <div class="shell">
+                <ul>
+                  <li><a class="active" href="#">HOME</a></li>
+                  <li><a href="#">ABOUT US</a></li>
+                  <li><a href="#">SERVICES</a></li>
+                  <li><a href="#">SOLUTIONS</a></li>
+                  <li><a href="#">BLOG</a></li>
+                  <li><a href="#">TESTIMONIALS</a></li>
+                  <li><a href="#">CONTACT</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="main">
+          <div class="shell">           
+            <div id="content">
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">            
+
+                </asp:ContentPlaceHolder>
+            </div>
+            <div class="cl">&nbsp;</div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="shell">
+            <p class="lf">Copyright &copy; 2014 <a href="http://www.neumologica.org" target="_blank">Fundaci&oacute;n Neumol&oacute;gica Colombiana</a> - Todos los derechos reservados</p>    
+            <div style="clear:both;"></div>
+          </div>
+        </div>    
+    </form>
+</body>
+</html>

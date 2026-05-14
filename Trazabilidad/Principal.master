@@ -1,0 +1,44 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Principal.master.cs" Inherits="Trazabilidad.Principal" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<%@ Register src="controls/menu.ascx" tagname="menu" tagprefix="uc1" %>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link href="~/css/newstyles.css" rel="stylesheet" type="text/css" runat="server" />
+    <link rel="stylesheet" type="text/css" href="~/css/newflexdropdown.css" runat="server" id="link2"/>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/flexdropdown.js"></script>
+    <script type="text/javascript">
+        flexdropdownmenu.arrowpath = 'images/arrow.gif';    
+    </script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" CombineScripts="false"></asp:ToolkitScriptManager>
+         <asp:UpdateProgress ID="UpdateProgress1" runat="server">
+            <ProgressTemplate>
+                    
+            </ProgressTemplate>
+        </asp:UpdateProgress>        
+        <div>
+            <div id="header" style="background-color:#FFFFFF">
+                <img src="images/logo_.png" title="fnc"  />
+            </div>
+            <div class="divMenu">
+               
+                <uc1:menu ID="menu1" runat="server" />
+            </div>            
+            <div>
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    
+                </asp:ContentPlaceHolder>
+            </div>
+        </div>
+    </form>    
+</body>
+</html>

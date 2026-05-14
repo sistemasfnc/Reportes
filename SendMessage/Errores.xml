@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<errores>
+  <error code="0">Envío Correcto</error>
+  <error code="-1">Error procesando la solicitud</error>
+  <error code="-2">No hay créditos suficientes</error>
+  <error code="-3">Red celular no cubierta para la cuenta</error>
+  <error code="-4">Error al consumir el servicio de envío de mensajes</error>
+  <error code="-5">Credenciales incorrectas</error>
+  <error code="-6">Dirección de destino incorrecta</error>
+  <error code="-10">Nombre de usuario no enviado</error>
+  <error code="-11">Password de usuario no enviado</error>  
+  <error code="-13">Número de destino desconocido</error>
+  <error code="-22">Formato XML incorrecto</error>
+  <error code="-23">Error General</error>
+  <error code="-26">Error de la interfaz de envío de SMS</error>
+  <error code="-27">Parámetro fecha de envío incorrecto</error>
+  <error code="-28">URL de envío incorrecta</error>
+  <error code="-30">Id de aplicación incorrecto</error>
+  <error code="-33">Id de mensaje duplicado</error>
+  <error code="-34">Nombre de remitente no permitido</error>
+  <error code="-99">Error procesando la solicitud</error>
+</errores>
