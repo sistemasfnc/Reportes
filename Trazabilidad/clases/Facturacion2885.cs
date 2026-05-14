@@ -1,19 +1,3 @@
-﻿using Config;
-using Entity;
-using EventLog;
-using Facade;
-using FluentFTP;
-using FluentFTP.Helpers;
-using FNCUtils;
-using Ionic.Zip;
-using iText.Kernel.Utils;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using Microsoft.Ajax.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OfficeOpenXml.Drawing.Chart;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +8,21 @@ using System.Text;
 using System.Web;
 using System.Web.DynamicData;
 using System.Xml.Linq;
+using Config;
+using Entity;
+using EventLog;
+using Facade;
+using FluentFTP;
+using FNCUtils;
+using Ionic.Zip;
+using iText.Kernel.Utils;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Utils;
 using static iTextSharp.text.pdf.AcroFields;
 
@@ -44,19 +43,19 @@ namespace Trazabilidad.clases
 
         private bool bunifiedsupport { get; set; }
 
-        private bool bfileinzip { get; set; }
+        private bool bfileinzip {  get; set; }
 
         private string sprocessid { get; set; }
 
         private bool bisbolivar { get; set; }
 
         private bool bisallianz { get; set; }
-
+         
         private StringBuilder lerror { get; set; }
 
         private StringBuilder lcontrol { get; set; }
 
-        public Facturacion2885()
+        public Facturacion2885() 
         {
             //this.listfiles = new List<string>();
             this.bisfaminasar = false;
@@ -66,12 +65,12 @@ namespace Trazabilidad.clases
             this.bisbolivar = this.bisallianz = false;
             this.sprocessid = string.Empty;
             this.lerror = new StringBuilder();
-            this.lcontrol = new StringBuilder();
+            this.lcontrol = new StringBuilder();    
         }
 
         public void GenerateFiles(List<Desmaterializacion> ldesmaterializacion)
         {
-
+            
             StringBuilder sfilename = new StringBuilder();
             string directory = Path.Combine(Configuration.GetStringValue("RelationshipsFolder"), this.sRelation);
             if (Directory.Exists(directory))
@@ -177,8 +176,8 @@ namespace Trazabilidad.clases
                     string[] files = Directory.GetFiles(sourceDirectory);
                     foreach (string file in files)
                     {
-                        zip.AddFile(file, string.Empty);
-                    }
+                        zip.AddFile(file, string.Empty);  
+                    }                    
                 }
                 zip.Save(zipFilePath);
             }
@@ -197,7 +196,7 @@ namespace Trazabilidad.clases
             else if (scompany.EqualsAnyOf("83", "53")) //Sura, suramericana
             {
                 return $"800180553_SETT_{sinvoice}";
-            }
+            }            
             else if (scompany.EqualsAnyOf("44")) //Positiva
             {
                 return $"FAC_800180553_SETT{sinvoice}";
@@ -286,7 +285,7 @@ namespace Trazabilidad.clases
             //this.CompressFiles($"SETT{sinvoice}");
             //this.RemoveFiles();
             this.listfiles.Clear();
-            this.bfileinzip = false;
+            this.bfileinzip = false;            
             this.GenerateSupports(ldesmaterializacion, sinvoice);
         }
 
@@ -365,7 +364,7 @@ namespace Trazabilidad.clases
             {
                 LogError.WriteError("Trazabilidad", "Trazabilidad", ex);
                 throw;
-            }
+            }            
         }
 
         private void ProcessCoomeva(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)
@@ -419,7 +418,7 @@ namespace Trazabilidad.clases
         private void ProcessAlianzColmena(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)
         {
             this.bunifiedsupport = true;
-            this.bfileinzip = false;
+            this.bfileinzip = false;            
             string ssupportdir = Path.Combine(directory, $"SOPORTES");
             string sinvoicedir = Path.Combine(directory, $"FACTURAS");
             if (!Directory.Exists(ssupportdir))
@@ -428,7 +427,7 @@ namespace Trazabilidad.clases
             }
             if (!Directory.Exists(sinvoicedir))
             {
-                Directory.CreateDirectory(sinvoicedir);
+                Directory.CreateDirectory(sinvoicedir); 
             }
             this.GenerateInvoiceFile(sinvoicepath, Path.Combine(sinvoicedir, sinvoicename), false);
             this.GenerateSupports(ldesmaterializacion, sinvoice, ssupportdir);
@@ -514,7 +513,7 @@ namespace Trazabilidad.clases
                 LogError.WriteError("Trazabilidad", "Trazabilidad", ex);
                 throw;
             }
-
+            
         }
 
         private void ProcessPositiva(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)
@@ -550,12 +549,12 @@ namespace Trazabilidad.clases
             {
                 Directory.CreateDirectory(sinvoicedir);
             }
-            this.GenerateInvoiceFile(sinvoicepath, Path.Combine(sinvoicedir, sinvoicename), false);
+            this.GenerateInvoiceFile(sinvoicepath, Path.Combine(sinvoicedir, sinvoicename), false);  
             this.bfileinzip = true;
             this.GenerateSupports(ldesmaterializacion, sinvoice);
             this.CompressFiles($"800180553_SETT{sinvoice}");
             this.RemoveFiles();
-            this.listfiles.Clear();
+            this.listfiles.Clear();           
         }
 
         private void ProcessAliansalud(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)
@@ -579,7 +578,7 @@ namespace Trazabilidad.clases
             catch (Exception ex)
             {
                 throw ex;
-            }
+            }            
             string ssuportpath = Path.Combine(directory, "SOPORTES");
             if (!Directory.Exists(ssuportpath))
             {
@@ -593,7 +592,7 @@ namespace Trazabilidad.clases
             catch (Exception ex)
             {
                 throw ex;
-            }
+            }            
             string sjsondir = Path.Combine(directory, "CUV");
             if (!Directory.Exists(sjsondir))
             {
@@ -620,7 +619,7 @@ namespace Trazabilidad.clases
             catch (Exception ex)
             {
                 throw ex;
-            }
+            }            
         }
 
         private void ProcessCapitalViva(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)
@@ -674,11 +673,11 @@ namespace Trazabilidad.clases
             this.bfileinzip = false;
             this.GenerateInvoiceFile(sinvoicepath, Path.Combine(directory, sinvoicename), false);
             this.GenerateSupports(ldesmaterializacion, sinvoice, directory);
-            string ssupportdir = Path.Combine(directory, "RIPS");
+            string ssupportdir = Path.Combine(directory, "RIPS");            
             if (!Directory.Exists(ssupportdir))
             {
                 Directory.CreateDirectory(ssupportdir);
-            }
+            }            
             this.CopyExtraFiles(sinvoice, ssupportdir, $"800180553_SETT{sinvoice}_CUV", $"800180553_SETT{sinvoice}_RIPS", string.Empty, false, ssupportdir);
             listfiles.AddRange(Directory.GetFiles(ssupportdir));
             this.CompressFiles($"800180553_SETT{sinvoice}");
@@ -726,7 +725,6 @@ namespace Trazabilidad.clases
                 LogError.WriteError("Trazabilidad", "Trazabilidad", ex);
                 throw;
             }
-
         }
 
         private void ProcessMedplus(string directory, string sinvoice, string sinvoicepath, string sinvoicename, List<Desmaterializacion> ldesmaterializacion)

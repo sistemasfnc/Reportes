@@ -244,6 +244,9 @@ Generated_Code/
 # Alternativa más agresiva (opcional)
 Properties/Settings.*
 
+# Carpeta de configuración
+Config/
+
 # =====================================================================
 # ARCHIVOS DE CONFIGURACIÓN PERSONAL
 # =====================================================================
