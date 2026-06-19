@@ -12,7 +12,7 @@ namespace Config
 {
     public class Configuration
     {
-        static string sXml = @"c:\Backup\www\Reportes\Config\bin\Debug\Config.dll.config";
+        static string sXml = @"C:\www\Pedro_Romero\Proyectos_NET\BusDatos\Reportes\Config\bin\Debug\Config.dll.config";
 
         //static string sXml = @"E:\\oldconfig\\Config.dll.config";
 
