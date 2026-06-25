@@ -68,17 +68,33 @@ Entidades especializadas para integraciones con EPS específicas.
 | 1 | `incomplete` | Sin diligenciar y sin enviar a central de cuentas |
 | 2 | `saved` | En caja con pendientes sin enviar a central de cuentas |
 | 3 | `dispatched` | En caja sin recibir en central de cuentas |
-| 4 | `recieved` | En central de cuentas recibido y auditado |
+| 4 | `recieved` | En central de cuentas recibido |
 | 5 | `readytoinvoice` | Listo para facturar sin pendientes |
 | 6 | `returned` | Devuelto a caja sin recibir |
 | 7 | `recievedreturned` | Recibido devuelto de central de cuentas |
 | 8 | `invoicedpending` | Con pendientes para facturar |
 | 9 | `readytoinvoicepending` | Listo para facturar con pendientes |
-| 10 | `intreatment` | En tratamiento |
-| 11 | `intreatmentnoncentral` | En tratamiento sin recibir en central de cuentas |
-| 12 | `intreatmentreturned` | En tratamiento devuelto |
+| 10 | `intreatment` | En tratamiento (definido en el enum, sin fila en `estadocargo`, sin botón que lo use) |
+| 11 | `intreatmentaudited` | En tratamiento auditado |
+| 12 | `intreatmentreturned` | En tratamiento Devuelto |
+| 13 | `intreatmentpendingreception` | En tratamiento sin recibir en central de cuentas |
+| 14 | `returnedpendingreception` | En caja devuelto sin recibir en central de cuentas |
 
-Los textos visibles se definen en `Utils\Tools.GetStatus(int)`. Los estados 10–12 no tienen descripción aún en ese método.
+Los textos visibles se definen en `Utils\Tools.GetStatus(int)`. El estado 10 es el único que sigue sin descripción ahí (cae al `default`) y sin fila en `estadocargo` — no se usa desde ningún botón.
+
+### Visibilidad de cargos por bandeja (filtros de cada grid)
+
+Cada página de la sección "Cargos" del menú consulta `cargo.ca_es_id` con su propio filtro hardcodeado en `CargosDAC.cs` (método `GetData`, dos variantes según `view`). Un mismo estado puede pertenecer a una sola bandeja o el código puede cambiarlo para que aparezca en otra:
+
+| Bandeja (menú) | Página | Filtro `ca_es_id` | Dónde |
+|---|---|---|---|
+| Revisar Cargos | `Listado.aspx` | `NULL` o `IN (1, 2, 3, 10)` | `CargosDAC.cs` ~L1120 |
+| Recibir Cargos | `Central.aspx` | `IN (2, 3, 13, 14)` | `CargosDAC.cs` ~L928 |
+| Registrar Cargos | `Auditar.aspx` | `IN (4, 8, 11)` | `CargosDAC.cs` ~L933 |
+| Recibir Devoluciones | `RecibirDevolucion.aspx` | `IN (6, 12)` | `CargosDAC.cs` ~L937 |
+| Tramitar Devoluciones | `Devolucion.aspx` | `= 7` (`recievedreturned`) | `CargosDAC.cs` ~L1056 (vía método de un solo estado) |
+
+Cada vez que se agregue un estado nuevo o se reutilice uno existente con otro significado, hay que revisar manualmente estos cinco filtros — no hay un mapeo centralizado estado→bandeja en el código, y olvidar uno hace que un cargo "desaparezca" o aparezca duplicado en dos bandejas.
 
 ### relationshipstatus — estado de RelacionEnvio (en código)
 

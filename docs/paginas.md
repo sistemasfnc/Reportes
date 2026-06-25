@@ -21,15 +21,15 @@ El sistema usa ASP.NET WebForms — no hay controllers REST. Cada página `.aspx
 | Página | Permiso | Descripción |
 |---|---|---|
 | `Listado.aspx` | `entrylist` (1) | Lista cargos pendientes de `VCargos`. Permite enviar a central (estado 3) o guardar soportes (estado 2). Botón "Completos" hace batch. |
-| `RecibirDevolucion.aspx` | `returnreception` (3) | Cajero recibe cargos devueltos por el facturador (estado 6→7) |
-| `Devolucion.aspx` | `returnresponse` (4) | Cajero tramita la devolución: responde motivos y reenvía (estado 7→4) |
+| `RecibirDevolucion.aspx` | `returnreception` (3) | Cajero recibe cargos devueltos por el facturador (estados 6 o 12 → 7) |
+| `Devolucion.aspx` | `returnresponse` (4) | Cajero tramita la devolución: responde motivos y reenvía. Si el motivo era el 12 ("En tratamiento Devuelto") pasa a estado 13, si no a estado 14 — en ambos casos vuelve a la bandeja "Recibir Cargos" de `Central.aspx`, no directo al facturador |
 | `Devoluciones.aspx` | [POR CONFIRMAR] | Lista de devoluciones |
 
 ### Flujo de Cargos — Facturador / Central de Cuentas
 | Página | Permiso | Descripción |
 |---|---|---|
-| `Central.aspx` | `entryreception` (5) | Recibe cargos del cajero. Botón Devolver envía a `Auditar.aspx` |
-| `Auditar.aspx` | `entryreturn` (6) | Registra y tramita devoluciones. Modal con motivos obligatorios. Botón listo para facturar (estado 5) |
+| `Central.aspx` | `entryreception` (5) | "Recibir Cargos". Recibe cargos del cajero (estados 3, 13, 14) → estado 4. Botón "En tratamiento auditado" (imbTramite) pasa el cargo directo a estado 11, visible en `Auditar.aspx` |
+| `Auditar.aspx` | `entryreturn` (6) | "Registrar Cargos". Ve cargos en estado 4, 8 u 11. Modal con motivos obligatorios para devolver: si el motivo es el 12 el cargo queda en estado 12, si no en estado 6. Botón listo para facturar (estado 5) |
 | `ListoFacturar.aspx` | `readytoinvoice` (25) | Cargos listos para facturar. Botón Devolver (estado 6) |
 | `CargosXFacturar.aspx` | [POR CONFIRMAR] | Cargos pendientes de facturación |
 

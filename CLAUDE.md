@@ -63,10 +63,12 @@ Si el archivo no existe en esa ruta, toda la aplicación falla al arrancar. Ver 
 - **`Config\bin\Debug\Config.dll.config`** — contiene todas las contraseñas de BD, FTP, SMS y AWS en texto plano
 - **`OnProduction = False`** en config — verificar antes de desplegar a producción; cuando es `False` apunta a SIDs de prueba (`PRUTRAZA`, `PRUINTEG`, `PRUFNEUM`)
 - **Tabla `cargo`** — los registros solo se crean desde la UI (modal de soportes en `Listado.aspx`); no existen al inicio aunque el ingreso aparezca en `VCargos`
+- **Tabla `estadocargo`** — de solo lectura desde la app (no hay CRUD en la UI). Agregar un `ChargeStatus` nuevo al enum sin insertar antes la fila correspondiente (`es_id`) en esta tabla causa `ORA-02291` (FK `CARGOESTADO_FK`) al primer `UPDATE cargo`. Ver `docs/dominio.md` → "Visibilidad de cargos por bandeja" para la lista de estados y filtros vigentes.
 
 ## Historial de cambios
 
 | Fecha | Cambio | Archivo(s) |
 |---|---|---|
 | 2026-06-19 | Corrección path Config.dll.config para nuevo equipo | `Config\Configuration.cs` |
+| 2026-06-25 | Estados 11 (redefinido a "En tratamiento auditado"), 13 y 14 agregados al flujo de devoluciones; nuevo botón en Central.aspx; ajuste de filtros de bandeja en Central/Auditar/RecibirDevolucion | `Entity\Generic.cs`, `DAC\CargosDAC.cs`, `Utils\Tools.cs`, `Trazabilidad\Central.aspx(.cs)`, `Trazabilidad\Devolucion.aspx.cs` |
 | | | |

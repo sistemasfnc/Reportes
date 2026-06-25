@@ -27,41 +27,61 @@ CAJERO — Listado.aspx
           → FacadeCargo.ChangeStatus(lista) → UPDATE + cargolog por cada uno
           → Redirect a Listado.aspx (cargos enviados desaparecen de la lista)
 
-FACTURADOR — Central.aspx
+FACTURADOR — Central.aspx ("Recibir Cargos", filtro ca_es_id IN (2, 3, 13, 14))
   │
-  ├─ [5] Recibe cargos despachados (estado 3)
-  │       → Puede marcar como recibido → estado recieved (4)
+  ├─ [5] Recibe cargos despachados (3), o reenviados tras devolución (13, 14)
+  │       → imbRecibir: marca como recibido → estado recieved (4), sin importar
+  │         si venía de 3, 13 o 14
   │
-  └─ [6] Puede devolver → va a Auditar.aspx
+  ├─ [6] Puede devolver → va a Auditar.aspx
+  │
+  └─ [6b] Botón "En tratamiento auditado" (imbTramite)
+           → estado intreatmentaudited (11) + INSERT cargolog
+           → el cargo pasa directo a la bandeja "Registrar Cargos" (Auditar.aspx)
 
-FACTURADOR — Auditar.aspx
+FACTURADOR — Auditar.aspx ("Registrar Cargos", filtro ca_es_id IN (4, 8, 11))
   │
-  ├─ [7] Ve cargos en estado recieved (4)
+  ├─ [7] Ve cargos en estado recieved (4), invoicedpending (8) o intreatmentaudited (11)
   │
   ├─ [8a] Devolver (RowCommand "Devolver")
   │        → Abre modal con lista de motivos (tabla motivodevolucion)
   │        → Debe seleccionar al menos un motivo (obligatorio)
   │        → SaveReasons() → INSERT INTO motivocargo
-  │        → UpdateStatus() → estado returned (6) + INSERT cargolog
-  │        → "Cargo devuelto al cajero correctamente"
+  │        → UpdateStatus():
+  │            si alguno de los motivos seleccionados tiene id = 12
+  │              → estado intreatmentreturned (12)
+  │            si no
+  │              → estado returned (6)
+  │        → INSERT cargolog → "Cargo devuelto al cajero correctamente"
   │
   └─ [8b] Marcar listo para facturar (imbFacturar)
            → estado readytoinvoice (5) + INSERT cargolog
 
-CAJERO — RecibirDevolucion.aspx
+CAJERO — RecibirDevolucion.aspx ("Recibir Devoluciones", filtro ca_es_id IN (6, 12))
   │
-  └─ [9] Recibe cargo devuelto (estado 6 → 7 recievedreturned)
+  └─ [9] Recibe cargo devuelto (estado 6 o 12) → estado recievedreturned (7)
+          (mismo destino sin importar el motivo de la devolución)
 
-CAJERO — Devolucion.aspx
+CAJERO — Devolucion.aspx ("Tramitar Devoluciones", filtro ca_es_id = 7)
   │
   └─ [10] Tramita la devolución
            → Agrega respuesta a cada motivo (txtRespuesta)
            → UpdateReasonsResponse() → UPDATE motivocargo
-           → Estado vuelve a recieved (4) si confirma
-           → Estado queda en recievedreturned (7) si solo guarda
+           → Botón "Enviar" (imbGuardar, tooltip "Enviar"):
+               vuelve a consultar los motivos del cargo (GetReasons)
+               si alguno tiene id = 12
+                 → estado intreatmentpendingreception (13)
+               si no
+                 → estado returnedpendingreception (14)
+               (en ambos casos el cargo vuelve a "Recibir Cargos" en Central.aspx,
+                NO directo a "Registrar Cargos")
+           → Botón "Guardar" (imbSalvar, tooltip "Guardar"):
+               solo guarda las respuestas, el estado queda en recievedreturned (7)
 ```
 
 **Resultado final:** cargo en estado `readytoinvoice` (5) queda disponible para generación de factura.
+
+**Nota:** el estado `intreatment` (10) está definido en el enum pero ningún botón lo usa actualmente, y la tabla `estadocargo` no tiene fila para él — cualquier intento de usarlo fallará con `ORA-02291` hasta que se inserte esa fila.
 
 ---
 
