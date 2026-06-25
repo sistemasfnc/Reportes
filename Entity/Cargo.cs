@@ -94,6 +94,8 @@ namespace Entity
         public string ssource { get; set; }
 
         public int iidprofile { get; set; }
+
+        public bool bIncludeReturnFlow { get; set; }
     }
 
     [Serializable]

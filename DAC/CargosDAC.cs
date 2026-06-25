@@ -925,7 +925,7 @@ namespace DAC
             }
             if (oEntity.status == 3)
             {
-                sQuery.Append(" AND ca_es_id IN (2, 3, 13, 14)");
+                sQuery.Append(oEntity.bIncludeReturnFlow ? " AND ca_es_id IN (2, 3, 13, 14)" : " AND ca_es_id IN (2, 3)");
             }
             else if (oEntity.status == (int)ChargeStatus.recieved)
             {

@@ -198,6 +198,7 @@ namespace Trazabilidad
                     notuser = string.Join(",", this.oUser.otheruser.ToArray()),
                     patientdocument = this.txtDocumento.Text,
                     authorization = this.txtAutorizacion.Text,
+                    bIncludeReturnFlow = true,
                 };
                 this.gvCargos.DataKeyNames = new string[] { "id", "idadmission" };
                 this.gvCargos.DataSource = oFacade.GetCharges(oCargo, true);
