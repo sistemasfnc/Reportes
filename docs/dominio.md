@@ -88,13 +88,15 @@ Cada página de la sección "Cargos" del menú consulta `cargo.ca_es_id` con su 
 
 | Bandeja (menú) | Página | Filtro `ca_es_id` | Dónde |
 |---|---|---|---|
-| Revisar Cargos | `Listado.aspx` | `NULL` o `IN (1, 2, 3, 10)` | `CargosDAC.cs` ~L1120 |
+| Revisar Cargos | `Listado.aspx` | por defecto `NULL` o `IN (1, 2, 3, 10)`; si el cajero filtra manualmente por el combo de estados, puede pedir cualquier valor entre 2 y 12 (incluido el 11), aunque no salga en la carga inicial | `CargosDAC.cs` ~L1120 |
 | Recibir Cargos | `Central.aspx` | `IN (2, 3, 13, 14)` | `CargosDAC.cs` ~L928 |
 | Registrar Cargos | `Auditar.aspx` | `IN (4, 8, 11)` | `CargosDAC.cs` ~L933 |
 | Recibir Devoluciones | `RecibirDevolucion.aspx` | `IN (6, 12)` | `CargosDAC.cs` ~L937 |
 | Tramitar Devoluciones | `Devolucion.aspx` | `= 7` (`recievedreturned`) | `CargosDAC.cs` ~L1056 (vía método de un solo estado) |
 
 Cada vez que se agregue un estado nuevo o se reutilice uno existente con otro significado, hay que revisar manualmente estos cinco filtros — no hay un mapeo centralizado estado→bandeja en el código, y olvidar uno hace que un cargo "desaparezca" o aparezca duplicado en dos bandejas.
+
+**Cuidado con métodos de consulta compartidos:** `Central.aspx`, `CargosFCI.aspx` y `ReporteRHB.aspx` consultan con `status = dispatched (3)` y caen en el mismo `if (oEntity.status == 3)` de `CargosDAC.cs`. Para que el `IN (2, 3, 13, 14)` solo aplique a `Central.aspx` (y no arrastre cargos en estado 13/14 a esos dos reportes), se agregó la propiedad `Cargo.bIncludeReturnFlow` (`Entity\Cargo.cs`) — solo `Central.aspx.cs` la pone en `true` al armar el filtro. Si se reutiliza este patrón de "un mismo estado, distinto significado según la página" en el futuro, hay que repetir esta técnica (un flag explícito en `Cargo`) en lugar de asumir que el valor de `status` identifica la página que llama.
 
 ### relationshipstatus — estado de RelacionEnvio (en código)
 
