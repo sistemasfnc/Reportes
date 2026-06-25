@@ -118,7 +118,7 @@
             <div>
                 <asp:ImageButton ID="imbRecibir" runat="server" ImageUrl="~/images/file.png" ToolTip="Recibir" OnClick="imbRecibir_Click" OnClientClick="return confirm('Esta seguro que desea recibir estos cargos?');" Width="30" Height="30" />&nbsp;
                 <asp:ImageButton ID="imbDevolver" runat="server" ImageUrl="~/images/reload.png" ToolTip="Devolver" OnClick="imbDevolver_Click" Visible="false" Width="30" Height="30" />
-                &nbsp;<asp:ImageButton ID="imbTramite" runat="server" ToolTip="En tratamiento devuelto" ImageUrl="~/images/list.png"  Width="30" Height="30" OnClick="imbTramite_Click" />
+                &nbsp;<asp:ImageButton ID="imbTramite" runat="server" ToolTip="En tratamiento auditado" ImageUrl="~/images/list.png"  Width="30" Height="30" OnClick="imbTramite_Click" />
                 &nbsp;<asp:ImageButton ID="imbFacturar" runat="server" ImageUrl="~/images/ready.png" ToolTip="Listo para Facturar" OnClientClick="return confirm('Esta seguro que desea facturar estos cargos');"  OnClick="imbFacturar_Click" Width="30" Height="30" />
             </div>
             <asp:LinkButton ID="lbtValidar" runat="server"></asp:LinkButton>

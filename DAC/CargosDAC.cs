@@ -925,16 +925,16 @@ namespace DAC
             }
             if (oEntity.status == 3)
             {
-                sQuery.Append(" AND ca_es_id IN (2, 3)");
+                sQuery.Append(" AND ca_es_id IN (2, 3, 13, 14)");
             }
             else if (oEntity.status == (int)ChargeStatus.recieved)
             {
                 //lParameters.Add(new OracleParameter(":status", oEntity.status));
-                sQuery.Append(" AND ca_es_id IN (4, 8)");
+                sQuery.Append(" AND ca_es_id IN (4, 8, 11)");
             }
             else if (oEntity.status == (int)ChargeStatus.returned)
             {
-                sQuery.Append(" AND ca_es_id IN (6, 11)");
+                sQuery.Append(" AND ca_es_id IN (6, 12)");
             }
             else if (oEntity.status > 1 && oEntity.status < 10)
             {
@@ -1117,7 +1117,7 @@ namespace DAC
             {
                 if (oEntity.status < 2)
                 {
-                    sQuery.Append(" AND (ca_es_id IS NULL OR ca_es_id IN (1, 2, 3, 10, 11))");
+                    sQuery.Append(" AND (ca_es_id IS NULL OR ca_es_id IN (1, 2, 3, 10))");
                 }
                 else if (oEntity.status > 1 && oEntity.status < 13)
                 {

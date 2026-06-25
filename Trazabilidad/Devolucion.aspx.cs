@@ -177,15 +177,17 @@ namespace Trazabilidad
                 oFacade.UpdateReasonsResponse(lSupport);
                 if (iStatus == (int)ChargeStatus.recieved)
                 {
+                    List<Support> lReasons = oFacade.GetReasons(this.idcgharge);
+                    int iFinalStatus = (lReasons.Exists(x => x.id == 12)) ? (int)ChargeStatus.intreatmentpendingreception : (int)ChargeStatus.returnedpendingreception;
                     oEntity = new Cargo()
                     {
                         id = this.idcgharge,
-                        status = iStatus,
+                        status = iFinalStatus,
                         iduser = this.oUser.id,
                         lastuser = this.oUser.username
                     };
-                    oFacade.CreateCharge(oEntity);                
-                }                
+                    oFacade.CreateCharge(oEntity);
+                }
             }
             catch (Exception ex)
             {

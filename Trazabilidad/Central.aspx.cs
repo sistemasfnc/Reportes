@@ -496,7 +496,7 @@ namespace Trazabilidad
 
         protected void imbTramite_Click(object sender, ImageClickEventArgs e)
         {
-            this.UpdateChargeStatus(this.GetSelected((int)ChargeStatus.intreatment));
+            this.UpdateChargeStatus(this.GetSelected((int)ChargeStatus.intreatmentaudited));
         }
 
         protected void imbTramite_Click1(object sender, ImageClickEventArgs e)

@@ -150,13 +150,17 @@ namespace Utils
                 case 1: return "Sin diligenciar y sin enviar a central de cuentas";
                 case 2: return "En caja con pendientes sin enviar a central de cuentas";
                 case 3: return "En caja sin recibir en central de cuentas";
-                case 4: return "En central de cuentas recibido y auditado";
+                case 4: return "En central de cuentas recibido";
                 case 5: return "Listo para facturar sin pendientes";
                 case 6: return "Devuelto a caja sin recibir";
                 case 7: return "Recibido Devuelto de central de cuentas";
                 case 8: return "Con pendientes para facturar";
                 case 9: return "Listo para facturar con pendientes";
-                default: return "Sin diligenciar";            
+                case 11: return "En tratamiento auditado";
+                case 12: return "En tratamiento Devuelto";
+                case 13: return "En tratamiento sin recibir en central de cuentas";
+                case 14: return "En caja devuelto sin recibir en central de cuentas";
+                default: return "Sin diligenciar";
 	        }
         }
 
@@ -167,12 +171,16 @@ namespace Utils
                 case 1: return (flag) ? "En caja sin diligenciar" : "Sin diligenciar y sin enviar a central de cuentas";
                 case 2: return (flag) ? "En caja con pendientes sin enviar a central de cuentas" : "En caja con pendientes sin enviar a central de cuentas";
                 case 3: return (flag) ? "En caja sin recibir en central de cuentas" : "En caja sin recibir en central de cuentas";
-                case 4: return (flag) ? "En central de cuentas recibido y auditado" : "En central de cuentas recibido y auditado";
+                case 4: return (flag) ? "En central de cuentas recibido" : "En central de cuentas recibido";
                 case 5: return (flag) ? "Listo para facturar sin pendientes" : "Listo para facturar sin pendientes";
                 case 6: return (flag) ? "Devuelto a caja sin recibir" : "Devuelto a caja sin recibir";
                 case 7: return (flag) ? "Recibido Devuelto de central de cuentas" : "Recibido Devuelto de central de cuentas";
                 case 8: return (flag) ? "Con pendientes para facturar" : "Con pendientes para facturar";
                 case 9: return (flag) ? "Listo para facturar con pendientes" : "Listo para facturar con pendientes";
+                case 11: return "En tratamiento auditado";
+                case 12: return "En tratamiento Devuelto";
+                case 13: return "En tratamiento sin recibir en central de cuentas";
+                case 14: return "En caja devuelto sin recibir en central de cuentas";
                 case 0: return "En caja sin diligenciar y sin enviar";
                 default: return "En caja sin diligenciar y sin enviar";
             }

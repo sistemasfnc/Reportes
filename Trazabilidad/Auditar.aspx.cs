@@ -113,7 +113,7 @@ namespace Trazabilidad
             else
             {
                 this.SaveReasons(lEntity);
-                this.UpdateStatus();
+                this.UpdateStatus(lEntity);
                 ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "", @"alert('Cargo devuelto al cajero correctamente');", true);
                 Response.Redirect("~/Auditar.aspx");
             }
@@ -279,10 +279,11 @@ namespace Trazabilidad
             }            
         }
         
-        private void UpdateStatus()
+        private void UpdateStatus(List<Support> lReasons)
         {
             List<Cargo> lCargo = new List<Cargo>();
-            Cargo oCargo = new Cargo() { id = this.idcgharge, status = (int)ChargeStatus.returned, iduser = this.oUser.id, lastuser = this.oUser.username };
+            int iStatus = (lReasons.Exists(x => x.id == 12)) ? (int)ChargeStatus.intreatmentreturned : (int)ChargeStatus.returned;
+            Cargo oCargo = new Cargo() { id = this.idcgharge, status = iStatus, iduser = this.oUser.id, lastuser = this.oUser.username };
             lCargo.Add(oCargo);
             this.UpdateChargeStatus(lCargo);
         }

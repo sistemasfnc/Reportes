@@ -40,8 +40,10 @@ namespace Entity
         invoicedpending = 8,
         readytoinvoicepending = 9,
         intreatment = 10,
-        intreatmentnoncentral = 11,
+        intreatmentaudited = 11,
         intreatmentreturned = 12,
+        intreatmentpendingreception = 13,
+        returnedpendingreception = 14,
     }
 
     public enum Permissions
