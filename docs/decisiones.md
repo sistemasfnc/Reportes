@@ -13,3 +13,10 @@
 - **Decisión tomada:** mantener el path como constante hardcodeada en el código en vez de leerlo de una variable de entorno o de un archivo de configuración relativo al ensamblado.
 - **Alternativas descartadas:** no hay evidencia en el repo de que se haya evaluado una alternativa (variable de entorno, `AppDomain.CurrentDomain.BaseDirectory`, etc.); se documenta como deuda técnica conocida, no como decisión deliberada con trade-offs evaluados.
 - **Consecuencias:** cada vez que el proyecto se mueve a un equipo o carpeta nueva, hay que actualizar `Config\Configuration.cs` a mano antes de poder compilar o correr la aplicación. Ver "Zonas de peligro" en `CLAUDE.md`.
+
+### Bloqueo NTFS (Zone.Identifier) al copiar el repo a un equipo nuevo
+
+- **Contexto:** el 2026-07-03, tras mover el proyecto a un equipo nuevo, el publish de Visual Studio empezó a fallar con `FileLoadException` / HRESULT `0x80131515` sobre un DLL del `bin` (`AjaxControlToolkit.dll`), aunque el proyecto compilaba y corría bien en IIS Express. La causa fue que Windows marcó todos los archivos del repo con el stream NTFS `Zone.Identifier` (Mark of the Web) al copiarlos desde red/zip.
+- **Decisión tomada:** documentar el diagnóstico y la solución (`Get-ChildItem -Recurse -File | Unblock-File` sobre la raíz del repo) en vez de cambiar el proceso de copia/distribución del código.
+- **Alternativas descartadas:** ninguna evaluada; es un efecto secundario de Windows al copiar archivos de un origen no confiable, no un problema del proyecto en sí.
+- **Consecuencias:** repetir el `Unblock-File` cada vez que el repo se copie o mueva a una máquina o carpeta nueva. Ver "Zonas de peligro" en `CLAUDE.md`.

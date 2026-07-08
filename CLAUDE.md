@@ -80,6 +80,7 @@ Ver [docs/decisiones.md](docs/decisiones.md)
 - **Tabla `cargo`** — los registros solo se crean desde la UI (modal de soportes en `Listado.aspx`); no existen al inicio aunque el ingreso aparezca en `VCargos`
 - **Tabla `estadocargo`** — de solo lectura desde la app (no hay CRUD en la UI). Agregar un `ChargeStatus` nuevo al enum sin insertar antes la fila correspondiente (`es_id`) en esta tabla causa `ORA-02291` (FK `CARGOESTADO_FK`) al primer `UPDATE cargo`. Ver `docs/dominio.md` → "Visibilidad de cargos por bandeja" para la lista de estados y filtros vigentes.
 - **Despliegue a producción** — el publish de Visual Studio (FileSystem, `PublishUrl=C:\Temp\cargos`) puede omitir DLLs sin cambios aparentes en su caché incremental (visto con `DAC.dll` quedando desactualizado). Verificar fecha de cada `.dll` copiado contra el build local antes de subir a producción, y copiar también los `.aspx` modificados (no solo el `bin`).
+- **Repo copiado/movido a un equipo nuevo** — Windows puede marcar todos los archivos con el stream NTFS `Zone.Identifier` (Mark of the Web), lo que no impide compilar ni correr en IIS Express pero sí rompe el publish: .NET Framework lanza `FileLoadException` con HRESULT `0x80131515` sobre algún DLL del `bin` (visto con `AjaxControlToolkit.dll`). Si aparece ese error al publicar pero el proyecto compila y corre bien, desbloquear todo el árbol con `Get-ChildItem -Path <ruta-del-repo> -Recurse -File | Unblock-File`.
 
 ## Pruebas
 
