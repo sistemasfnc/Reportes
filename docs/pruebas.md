@@ -29,3 +29,4 @@ Desde 2026-07-08 se adoptó como comportamiento estándar proponer/escribir prue
 ## Historial de cobertura
 
 - **2026-07-24** — Sin pruebas nuevas. Cambio: filtro `WHERE mo_id <> 11` en `GenericDAC.GetReasonsData()` para ocultar un motivo de devolución. No se escribió prueba porque cae enteramente en la capa `DAC` de acceso directo a Oracle, ya excluida arriba en "Qué NO se prueba y por qué".
+- **2026-07-24** — Sin pruebas nuevas. Cambio: 6 códigos de empresa nuevos en `Trazabilidad\clases\Facturacion2885.GetInvoiceName()`. A diferencia del caso anterior, esta sí es lógica pura testeable sin mocks; se decidió con el usuario diferir la creación del primer proyecto de tests de la solución. **Pendiente:** cuando se cree, cubrir `GetInvoiceName()` para los códigos 277-282 (caso feliz, heredan formato de su empresa de referencia) y el caso `else` genérico (incluye 27/281).

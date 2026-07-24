@@ -185,7 +185,7 @@ namespace Trazabilidad.clases
 
         private string GetInvoiceName(string sinvoice)
         {
-            if (scompany.EqualsAnyOf("21", "260")) //Compensar
+            if (scompany.EqualsAnyOf("21", "260", "280")) //Compensar
             {
                 return $"FV_800180553_SETT{sinvoice}";
             }
@@ -193,7 +193,7 @@ namespace Trazabilidad.clases
             {
                 return $"FAT_800180553_SETT{sinvoice}";
             }
-            else if (scompany.EqualsAnyOf("83", "53")) //Sura, suramericana
+            else if (scompany.EqualsAnyOf("83", "53", "282")) //Sura, suramericana
             {
                 return $"800180553_SETT_{sinvoice}";
             }            
@@ -201,7 +201,7 @@ namespace Trazabilidad.clases
             {
                 return $"FAC_800180553_SETT{sinvoice}";
             }
-            else if (scompany.EqualsAnyOf("25", "171", "09", "50", "02", "17", "23", "01", "16", "114", "255", "261")) //Sanitas, Viva 1, capital salud, Salud Total, Allianz, Colmena, Coomeva, Aliansalud, colmedica, Ecopetrol, Armada
+            else if (scompany.EqualsAnyOf("25", "171", "09", "50", "02", "17", "23", "01", "16", "114", "255", "261", "277", "278", "279")) //Sanitas, Viva 1, capital salud, Salud Total, Allianz, Colmena, Coomeva, Aliansalud, colmedica, Ecopetrol, Armada
             {
                 return $"FEV_800180553_SETT{sinvoice}";
             }
@@ -895,7 +895,7 @@ namespace Trazabilidad.clases
             /*this.scompany = "64";
             this.sRelation = "00000";*/
             string directory = Path.Combine(Configuration.GetStringValue("RelationshipsFolder"), this.sRelation);
-            if (scompany.EqualsAnyOf("21", "260", "259")) //Compensar
+            if (scompany.EqualsAnyOf("21", "260", "259", "280")) //Compensar
             {
                 this.ProcessCompensar(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
@@ -903,7 +903,7 @@ namespace Trazabilidad.clases
             {
                 this.ProcessBolivar(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
-            else if (scompany.EqualsAnyOf("25")) //Sanitas
+            else if (scompany.EqualsAnyOf("25", "277")) //Sanitas
             {
                 this.ProcessSanitas(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
@@ -911,7 +911,7 @@ namespace Trazabilidad.clases
             {
                 this.ProcessCoomeva(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
-            else if (scompany.EqualsAnyOf("83", "53")) //Sura, Suramericana, Sura ARL
+            else if (scompany.EqualsAnyOf("83", "53", "282")) //Sura, Suramericana, Sura ARL
             {
                 this.ProcessSura(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
@@ -947,7 +947,7 @@ namespace Trazabilidad.clases
             {
                 this.ProcessCapitalViva(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
-            else if (scompany.EqualsAnyOf("50", "261")) //Salud Total
+            else if (scompany.EqualsAnyOf("50", "261", "279")) //Salud Total
             {
                 this.ProcessSaludTotal(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
@@ -955,7 +955,7 @@ namespace Trazabilidad.clases
             {
                 this.ProcessMedplus(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
-            else if (scompany.EqualsAnyOf("01", "16")) //Aliansalud, Colmedica
+            else if (scompany.EqualsAnyOf("01", "16", "278")) //Aliansalud, Colmedica
             {
                 this.ProcessColmedica(directory, sinvoice, sinvoicepath, sinvoicename, ldesmaterializacion);
             }
@@ -1176,7 +1176,7 @@ namespace Trazabilidad.clases
                 this.lerror.AppendLine($"Archivo CUV para SETT{sinvoice} no ha podido ser encontrado en S3");
             }
 
-            if (!string.IsNullOrEmpty(sxmlKey) && !this.scompany.EqualsAnyOf("50", "261"))
+            if (!string.IsNullOrEmpty(sxmlKey) && !this.scompany.EqualsAnyOf("50", "261", "279"))
             {
                 try
                 {
@@ -1195,10 +1195,10 @@ namespace Trazabilidad.clases
                             ? Path.Combine(sxmlfinalpath, localName)
                             : Path.Combine(sxmlfinalpath, $"{sxmlname}.xml");
 
-                        if (this.scompany.EqualsOfAny("44", "26", "263", "23", "25", "43"))
+                        if (this.scompany.EqualsOfAny("44", "26", "263", "23", "25", "43", "277"))
                         {
                             sdestination = sdestination.Replace("FEV", "XML");
-                            if (this.scompany.EqualsOfAny("23", "25", "43"))
+                            if (this.scompany.EqualsOfAny("23", "25", "43", "277"))
                             {
                                 var tmpconsecutive = sfilecuvname.Replace(".json", "");
                                 tmpconsecutive = tmpconsecutive.Replace("CUV_", "");
@@ -1950,7 +1950,7 @@ namespace Trazabilidad.clases
             {
                 sauthname = "OPF";
             }
-            else if (this.scompany.EqualsAnyOf("50", "261", "02"))
+            else if (this.scompany.EqualsAnyOf("50", "261", "02", "279"))
             {
                 sauthname = "OPF";
                 ssupportname = "PDX";

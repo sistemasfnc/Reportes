@@ -113,9 +113,9 @@ La validación funcional es manual vía IIS o IIS Express (ver `docs/pruebas.md`
 
 (máximo 3 entradas, el historial completo está en docs/historial.md)
 
+- 2026-07-24 — Nuevos códigos de empresa 277-282 (Régimen Subsidiado) en desmaterialización (Facturacion2885)
 - 2026-07-24 — Motivo de devolución 11 ("Paciente en tratamiento") oculto de las ventanas de selección en Auditar.aspx y ListoFacturar.aspx
 - 2026-06-25 — Estados 11/13/14 agregados al flujo de devoluciones; nuevo botón "En tratamiento auditado" en Central.aspx
-- 2026-06-19 — Corrección path Config.dll.config para nuevo equipo
 
 ---
 
