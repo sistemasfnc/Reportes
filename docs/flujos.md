@@ -44,7 +44,7 @@ FACTURADOR — Auditar.aspx ("Registrar Cargos", filtro ca_es_id IN (4, 8, 11))
   ├─ [7] Ve cargos en estado recieved (4), invoicedpending (8) o intreatmentaudited (11)
   │
   ├─ [8a] Devolver (RowCommand "Devolver")
-  │        → Abre modal con lista de motivos (tabla motivodevolucion)
+  │        → Abre modal con lista de motivos (tabla motivodevolucion, excluye mo_id = 11 desde 2026-07-24)
   │        → Debe seleccionar al menos un motivo (obligatorio)
   │        → SaveReasons() → INSERT INTO motivocargo
   │        → UpdateStatus():

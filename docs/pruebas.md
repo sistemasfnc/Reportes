@@ -28,4 +28,4 @@ Desde 2026-07-08 se adoptó como comportamiento estándar proponer/escribir prue
 
 ## Historial de cobertura
 
-(vacío al inicio)
+- **2026-07-24** — Sin pruebas nuevas. Cambio: filtro `WHERE mo_id <> 11` en `GenericDAC.GetReasonsData()` para ocultar un motivo de devolución. No se escribió prueba porque cae enteramente en la capa `DAC` de acceso directo a Oracle, ya excluida arriba en "Qué NO se prueba y por qué".

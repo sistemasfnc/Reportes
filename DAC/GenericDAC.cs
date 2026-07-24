@@ -445,7 +445,7 @@ namespace DAC
 
         private DataTable GetReasonsData()
         {
-            StringBuilder sQuery = new StringBuilder("SELECT mo_id, mo_nombre FROM motivodevolucion");
+            StringBuilder sQuery = new StringBuilder("SELECT mo_id, mo_nombre FROM motivodevolucion WHERE mo_id <> 11");
             using (OracleDAC oDAC = new OracleDAC())
             {
                 oDAC.sConnection = this.ConnectionString;
