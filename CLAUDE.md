@@ -73,10 +73,13 @@ Ver [docs/decisiones.md](docs/decisiones.md)
 ## Zonas de peligro
 
 - **`Config\Configuration.cs`** — lee desde un path **hardcodeado** (`C:\www\Pedro_Romero\Proyectos_NET\BusDatos\Reportes\Config\bin\Debug\Config.dll.config`); si no existe ahí, toda la aplicación falla al arrancar. Cambiar al migrar de máquina. Ver `docs/arquitectura.md` para el esquema XML esperado.
+  - **NUNCA copiar/desplegar `Config.dll` compilado en un equipo de desarrollo hacia otro ambiente (staging/producción).** El path que queda embebido en el `.dll` es el que estaba activo en `Configuration.cs` al momento de compilar en ESE equipo — no es relativo ni se ajusta solo al servidor destino. Pasar un `Config.dll` de dev a producción (incluso "sin querer", como parte de copiar varios `.dll` juntos) rompe **toda** lectura de configuración en el ambiente destino — contraseñas, connection strings, todo — y se manifiesta como fallos que parecen no tener relación (ej. login rechaza contraseña correcta), no como un error de configuración obvio. Pasó realmente el 2026-07-29 (ver `docs/historial.md`).
+  - Si hay que reconstruir `Config.dll` para producción, cambiar temporalmente el path activo en `Configuration.cs` al de destino (confirmando antes dónde vive realmente el `Config.dll.config` en ese servidor — no asumir), compilar, copiar solo ese `.dll`, y revertir el path local inmediatamente para no romper el entorno de desarrollo.
+  - **Riesgo de colisión entre desarrolladores:** si más de una persona compila desde una ruta local distinta, cada commit a este archivo "arregla" el path para su propio equipo y rompe el de los demás en silencio (sin conflicto de git, porque técnicamente es una edición válida). Antes de cerrar este requerimiento, valdría la pena resolver esto de fondo (variable de entorno, archivo local `.gitignore`d, o similar) en vez de seguir editando la constante a mano.
 - **`Trazabilidad\Web.config`** — contiene credenciales de impersonación (`fnc\vidar`)
 - **`Config\bin\Debug\Config.dll.config`** — contiene todas las contraseñas de BD, FTP, SMS y AWS en texto plano
 - **`OnProduction = False`** en config — verificar antes de desplegar a producción; cuando es `False` apunta a SIDs de prueba (`PRUTRAZA`, `PRUINTEG`, `PRUFNEUM`)
-- **Dependencia externa FNCESB** — `DAC.csproj` referencia `..\..\FNCESB\FNCUtils\FNCUtils.csproj` y `Facade.csproj` referencia `..\..\FNCESB\FNCDAC\FNCDAC.csproj`. Deben existir en `C:\...\FNCESB\` o el build falla.
+- **Dependencia externa FNCESB** — `DAC.csproj` referencia `..\..\FNCESB\FNCUtils\FNCUtils.csproj` y `Facade.csproj` referencia `..\..\FNCESB\FNCDAC\FNCDAC.csproj`. Deben existir en `C:\...\FNCESB\` o el build falla. Además de ser una dependencia de build, `FNCESB\FNCDAC\ServinteOracle.cs` y `FNCESB\FNCUtils\Tools.cs` contienen la lógica que escribe ingresos directamente en Servinte para toda la familia de páginas "Cargar plantilla ingresos..." — ver `docs/externas.md` → "Creación de ingresos por plantilla".
 - **Tabla `cargo`** — los registros solo se crean desde la UI (modal de soportes en `Listado.aspx`); no existen al inicio aunque el ingreso aparezca en `VCargos`
 - **Tabla `estadocargo`** — de solo lectura desde la app (no hay CRUD en la UI). Agregar un `ChargeStatus` nuevo al enum sin insertar antes la fila correspondiente (`es_id`) en esta tabla causa `ORA-02291` (FK `CARGOESTADO_FK`) al primer `UPDATE cargo`. Ver `docs/dominio.md` → "Visibilidad de cargos por bandeja" para la lista de estados y filtros vigentes.
 - **Despliegue a producción** — el publish de Visual Studio (FileSystem, `PublishUrl=C:\Temp\cargos`) puede omitir DLLs sin cambios aparentes en su caché incremental (visto con `DAC.dll` quedando desactualizado). Verificar fecha de cada `.dll` copiado contra el build local antes de subir a producción, y copiar también los `.aspx` modificados (no solo el `bin`).
@@ -113,9 +116,9 @@ La validación funcional es manual vía IIS o IIS Express (ver `docs/pruebas.md`
 
 (máximo 3 entradas, el historial completo está en docs/historial.md)
 
+- 2026-07-29 — Incidente de despliegue (upgrade AWSSDK en FNCESB + caída por Config.dll); ver "Zonas de peligro" y docs/decisiones.md
 - 2026-07-24 — Nuevos códigos de empresa 277-282 (Régimen Subsidiado) en desmaterialización (Facturacion2885)
 - 2026-07-24 — Motivo de devolución 11 ("Paciente en tratamiento") oculto de las ventanas de selección en Auditar.aspx y ListoFacturar.aspx
-- 2026-06-25 — Estados 11/13/14 agregados al flujo de devoluciones; nuevo botón "En tratamiento auditado" en Central.aspx
 
 ---
 

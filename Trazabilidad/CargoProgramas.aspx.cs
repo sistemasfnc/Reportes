@@ -215,9 +215,18 @@ namespace Trazabilidad
                 this.LoadLists();
                 if (this.ValidateFile())
                 {
-                    this.lPatient = this.GetPatients();
-                    this.gvIngresos.DataSource = this.lPatient;
-                    this.gvIngresos.DataBind();
+                    try
+                    {
+                        this.lPatient = this.GetPatients();
+                        this.gvIngresos.DataSource = this.lPatient;
+                        this.gvIngresos.DataBind();
+                    }
+                    catch (ApplicationException ex)
+                    {
+                        LogError.WriteError("Facturacion", "Aplicacion", ex);
+                        this.lblError.Text = ex.Message;
+                        e.Cancel = true;
+                    }
                 }
                 else
                 {
