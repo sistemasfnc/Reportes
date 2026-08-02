@@ -335,15 +335,21 @@ namespace Trazabilidad.clases
             try
             {
                 this.GenerateInvoiceFile(sinvoicepath, Path.Combine(directory, sinvoicename));
-                bool tieneMultiplesDocumentos = ldesmaterializacion.Where(x => x.sfactura == sinvoice).Select(x => x.sdocumento).Distinct().Count() > 1;
-                if (tieneMultiplesDocumentos)
-                {
-                    this.GenerateSanitasSupports(ldesmaterializacion, sinvoice, directory);
-                }
-                else
-                {
-                    this.GenerateSupports(ldesmaterializacion, sinvoice, directory);
-                }
+                // Un HEV por factura, sin sufijo de cédula (siempre un solo paciente por factura para esta empresa).
+                // Se deja el bloque comentado (no se borra) porque GenerateSanitasSupports() sigue en uso en otro
+                // flujo de esta misma clase (Sanitas prepago, ver llamado ~línea 592): si a futuro Sanitas vuelve
+                // a facturar con múltiples documentos/pacientes por factura, hay que restaurar esta rama, o los
+                // soportes se generarán sin el sufijo de cédula y quedarán mal al enviarlos a la EPS.
+                //bool tieneMultiplesDocumentos = ldesmaterializacion.Where(x => x.sfactura == sinvoice).Select(x => x.sdocumento).Distinct().Count() > 1;
+                //if (tieneMultiplesDocumentos)
+                //{
+                //    this.GenerateSanitasSupports(ldesmaterializacion, sinvoice, directory);
+                //}
+                //else
+                //{
+                //    this.GenerateSupports(ldesmaterializacion, sinvoice, directory);
+                //}
+                this.GenerateSupports(ldesmaterializacion, sinvoice, directory);
                 this.CompressFiles($"800180553_SETT{sinvoice}");
                 this.RemoveFiles();
                 this.listfiles.Clear();
