@@ -551,7 +551,7 @@ namespace Trazabilidad
             {
                 return "País de expedición del documento incorrecto";
             }
-            else if (this.ddlTipo.SelectedValue == "Si" && !string.IsNullOrEmpty(values[44]))
+            else if (this.ddlTipo.SelectedValue == "Si" && values.Length > 44 && !string.IsNullOrEmpty(values[44]))
             {
                 if (!Utils.Tools.IsNumeric(values[44]))
                     return "El ingreso origen debe ser un número";
@@ -691,9 +691,9 @@ namespace Trazabilidad
                               scie10 = "Z000",
                               scontract = string.Empty,
                               sattendingtype = a.Elements.First()[42],
-                              sname = !string.IsNullOrEmpty(a.Elements.First()[44]) ? a.Elements.First()[44] : string.Empty,
+                              sname = (a.Elements.First().Length > 44 && !string.IsNullOrEmpty(a.Elements.First()[44])) ? a.Elements.First()[44] : string.Empty,
                           };
-                          if (this.ddlTipo.SelectedValue == "Si" && !string.IsNullOrEmpty(a.Elements.First()[44]))
+                          if (this.ddlTipo.SelectedValue == "Si" && a.Elements.First().Length > 44 && !string.IsNullOrEmpty(a.Elements.First()[44]))
                           {
                               inspiraCita.ientrysource = Convert.ToInt32(a.Elements.First()[44]);
                           }
