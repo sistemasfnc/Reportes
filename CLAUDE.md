@@ -116,9 +116,9 @@ La validación funcional es manual vía IIS o IIS Express (ver `docs/pruebas.md`
 
 (máximo 3 entradas, el historial completo está en docs/historial.md)
 
+- 2026-08-02 — Un solo HEV por factura Sanitas, sin sufijo de cédula (Facturacion2885); commit sin push por permiso denegado a DevNeumo
+- 2026-08-02 — Fix IndexOutOfRangeException al cargar plantilla de valoraciones (CargarValoraciones)
 - 2026-07-29 — Incidente de despliegue (upgrade AWSSDK en FNCESB + caída por Config.dll); ver "Zonas de peligro" y docs/decisiones.md
-- 2026-07-24 — Nuevos códigos de empresa 277-282 (Régimen Subsidiado) en desmaterialización (Facturacion2885)
-- 2026-07-24 — Motivo de devolución 11 ("Paciente en tratamiento") oculto de las ventanas de selección en Auditar.aspx y ListoFacturar.aspx
 
 ---
 
