@@ -72,5 +72,9 @@ namespace Entity
         public string sepisodio { get; set; }
 
         public bool bmultiple { get; set; }
+
+        public string splan { get; set; }
+
+        public string sapcita { get; set; }
     }
 }

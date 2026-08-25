@@ -288,6 +288,8 @@ namespace DAC
                         snotadebito = dataRow["NOTADEBITO"].ToString(),
                         svalordebito = dataRow["VALORDEBITO"].ToString(),
                         sepisodio = dataRow["EPISODIO"].ToString(),
+                        splan = dataRow["NOMBREPLAN"].ToString(),
+                        sapcita = dataRow["APCITA"].ToString(),
                         bmultiple = (Convert.ToInt32(dataRow["MULTIPLE"]) > 1),
                     };
                     ldesmaterializacion.Add(desmaterializacion);

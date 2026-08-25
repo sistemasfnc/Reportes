@@ -1714,6 +1714,17 @@ namespace Trazabilidad.clases
                 {
                     try
                     {
+                        if (Path.GetExtension(item).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            PdfReader itemReader = new PdfReader(item);
+                            for (int i = 1; i <= itemReader.NumberOfPages; i++)
+                            {
+                                pdfCopy.AddPage(pdfCopy.GetImportedPage(itemReader, i));
+                            }
+                            itemReader.Close();
+                            continue;
+                        }
+
                         MemoryStream ms = new MemoryStream();
                         Document tempDoc = new Document(PageSize.LETTER);
                         PdfWriter writer = PdfWriter.GetInstance(tempDoc, ms);
@@ -1860,23 +1871,84 @@ namespace Trazabilidad.clases
 
         private void GenerateSupports(List<Desmaterializacion> ldesmaterializacion, string sinvoice, string sdestinationpath = "")
         {
-            List<Generic> lgeneric = null;
-            List<string> lsupports = null;
-            string[] supportpath = null;
-            string scode = string.Empty;
+            List<string> lspecialplans = Configuration.GetStringValue("PlanesProgramasEspeciales").Split(',').Select(p => p.Trim().Trim('\'')).ToList();
+            string splan = ldesmaterializacion.Where(z => z.sfactura == sinvoice).Select(z => z.splan).FirstOrDefault();
+            bool bespecial = !string.IsNullOrEmpty(splan) && lspecialplans.Contains(splan);
+            {
+                List<Generic> lgeneric = null;
+                List<string> lsupports = null;
+                string[] supportpath = null;
+                string scode = string.Empty;
+                var tmp = ldesmaterializacion.Where(z => z.sfactura == sinvoice).Select
+                (
+                    x => new
+                    {
+                        schapter = x.sepisodio,
+                        sinvoive = x.sfactura
+                    }
+                )
+                .GroupBy
+                (
+                    x => new
+                    {
+                        x.schapter,
+                        x.sinvoive
+                    }
+                )
+                .Select
+                (
+                    y => new
+                    {
+                        chapter = y.Key.schapter
+                    }
+                ).ToList();
+                foreach (var item in tmp)
+                {
+                    lgeneric = this.GetInvoiceSupports(item.chapter);
+                    foreach (var generic in lgeneric)
+                    {
+                        supportpath = new string[] { Configuration.GetStringValue("SupportsPath"), generic.date.Year.ToString(), generic.date.Month.ToString(), generic.date.Day.ToString() };
+                        lsupports = new List<string>();
+                        lsupports = this.SearchFile(generic.name + "*.jpg", Path.Combine(supportpath), lsupports);
+                        scode = !this.bunifiedsupport ? generic.code : "Soporte";
+                        if (lsupports.Count > 0)
+                        {
+                            this.GeneratePDFSupport(string.Empty, lsupports, scode, sinvoice, sdestinationpath);
+                        }
+                    }
+                }
+            }
+            if (bespecial)
+            {
+                this.GenerateSpecialPlanSupports(ldesmaterializacion, sinvoice, sdestinationpath);
+            }
+        }
+
+        /// <summary>
+        /// Busca los soportes (HC y SOP) de facturas con plan de programa especial en \\Loki2\BACKUP\SOPORTES,
+        /// ya que para estos planes el soporte no se genera desde la base de datos como en el flujo normal.
+        /// Nombre de archivo esperado: {documento}_{fechaingreso YYYYMMDD}_{cita sin guion}_{consecutivo}_{HC|SOP}.pdf
+        /// </summary>
+        private void GenerateSpecialPlanSupports(List<Desmaterializacion> ldesmaterializacion, string sinvoice, string sdestinationpath = "")
+        {
+            string ssupportsfolder = Configuration.GetStringValue("SupportsSpecialPlansPath");
+            List<string> lallfiles = Directory.GetFiles(ssupportsfolder).ToList();
             var tmp = ldesmaterializacion.Where(z => z.sfactura == sinvoice).Select
             (
                 x => new
                 {
-                    schapter = x.sepisodio,
-                    sinvoive = x.sfactura
+                    singreso = x.singreso,
+                    sinvoive = x.sfactura,
+                    scita = x.sapcita,
+                    sdocument = x.sdocumento,
+                    sadmissiondate = x.sfechaingreso
                 }
             )
             .GroupBy
             (
                 x => new
                 {
-                    x.schapter,
+                    x.singreso,
                     x.sinvoive
                 }
             )
@@ -1884,24 +1956,100 @@ namespace Trazabilidad.clases
             (
                 y => new
                 {
-                    chapter = y.Key.schapter
+                    chapter = y.Key.singreso,
+                    cita = y.First().scita,
+                    document = y.First().sdocument,
+                    admissiondate = y.First().sadmissiondate
                 }
             ).ToList();
+
+            List<string> lHC = new List<string>();
+            List<string> lSOP = new List<string>();
             foreach (var item in tmp)
             {
-                lgeneric = this.GetInvoiceSupports(item.chapter);
-                foreach (var generic in lgeneric)
+                string scitaclean = (item.cita ?? string.Empty).Replace("-", string.Empty);
+                bool bcitavalida = !string.IsNullOrEmpty(scitaclean) && scitaclean != "0";
+                string scitatoken = $"_{scitaclean}_";
+                List<string> litemHC = bcitavalida ? lallfiles.Where(f => ContainsCitaAndIsType(f, scitatoken, false)).ToList() : new List<string>();
+                List<string> litemSOP = bcitavalida ? lallfiles.Where(f => ContainsCitaAndIsType(f, scitatoken, true)).ToList() : new List<string>();
+
+                if (litemHC.Count == 0 || litemSOP.Count == 0)
                 {
-                    supportpath = new string[] { Configuration.GetStringValue("SupportsPath"), generic.date.Year.ToString(), generic.date.Month.ToString(), generic.date.Day.ToString() };
-                    lsupports = new List<string>();
-                    lsupports = this.SearchFile(generic.name + "*.jpg", Path.Combine(supportpath), lsupports);
-                    scode = !this.bunifiedsupport ? generic.code : "Soporte";
-                    if (lsupports.Count > 0)
+                    string syearmonth = (item.admissiondate != null && item.admissiondate.Length >= 6) ? item.admissiondate.Substring(0, 6) : string.Empty;
+                    if (!string.IsNullOrEmpty(syearmonth) && !string.IsNullOrEmpty(item.document))
                     {
-                        this.GeneratePDFSupport(string.Empty, lsupports, scode, sinvoice, sdestinationpath);
+                        string sdocmonth = $"{item.document}_{syearmonth}";
+                        if (litemHC.Count == 0)
+                        {
+                            litemHC = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, false)).ToList();
+                        }
+                        if (litemSOP.Count == 0)
+                        {
+                            litemSOP = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, true)).ToList();
+                        }
                     }
                 }
+
+                if (litemHC.Count == 0)
+                {
+                    this.lerror.AppendLine($"No se encontró archivo HC para el ingreso {item.chapter} de la factura SETT{sinvoice}");
+                }
+                if (litemSOP.Count == 0)
+                {
+                    this.lerror.AppendLine($"No se encontró archivo SOP para el ingreso {item.chapter} de la factura SETT{sinvoice}");
+                }
+
+                lHC.AddRange(litemHC);
+                lSOP.AddRange(litemSOP);
             }
+
+            string scodehc = !this.bunifiedsupport ? "Historia Clinica" : "Soporte";
+            string scodesop = !this.bunifiedsupport ? "Soporte Clinico" : "Soporte";
+            if (lHC.Count > 0)
+            {
+                this.GeneratePDFSupport(string.Empty, lHC, scodehc, sinvoice, sdestinationpath);
+            }
+            if (lSOP.Count > 0)
+            {
+                this.GeneratePDFSupport(string.Empty, lSOP, scodesop, sinvoice, sdestinationpath);
+            }
+        }
+
+        /// <summary>
+        /// Indica si el nombre de archivo contiene el token de cita (ej. "_AP0047553679_") y corresponde al tipo pedido.
+        /// Los HC terminan limpio en "_HC.pdf"; los SOP traen sufijo adicional después de "_SOP" (ej. "_SOP_documento_fecha_..pdf").
+        /// </summary>
+        private static bool ContainsCitaAndIsType(string filepath, string scitatoken, bool bissop)
+        {
+            string fname = Path.GetFileName(filepath);
+            if (fname.IndexOf(scitatoken, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return false;
+            }
+            return bissop
+                ? fname.IndexOf("_SOP", StringComparison.OrdinalIgnoreCase) >= 0 && fname.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)
+                : fname.EndsWith("_HC.pdf", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Fallback por documento+año/mes: el nombre debe iniciar con "{documento}_{yyyyMM}", seguido de exactamente
+        /// 2 dígitos de día y un guion bajo, y luego corresponder al tipo pedido (mismo criterio que ContainsCitaAndIsType).
+        /// </summary>
+        private static bool StartsWithDocMonthAndIsType(string filepath, string sdocmonth, bool bissop)
+        {
+            string fname = Path.GetFileName(filepath);
+            if (!fname.StartsWith(sdocmonth, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            string remainder = fname.Substring(sdocmonth.Length);
+            if (remainder.Length < 3 || !char.IsDigit(remainder[0]) || !char.IsDigit(remainder[1]) || remainder[2] != '_')
+            {
+                return false;
+            }
+            return bissop
+                ? remainder.IndexOf("_SOP", StringComparison.OrdinalIgnoreCase) >= 0 && remainder.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)
+                : remainder.EndsWith("_HC.pdf", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
