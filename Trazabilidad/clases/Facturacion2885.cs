@@ -2003,32 +2003,15 @@ namespace Trazabilidad.clases
                 lSOP.AddRange(litemSOP);
             }
 
-            if (!this.bunifiedsupport)
+            string scodehc = !this.bunifiedsupport ? "Historia Clinica" : "Soporte";
+            string scodesop = !this.bunifiedsupport ? "Soporte Clinico" : "Soporte";
+            if (lHC.Count > 0)
             {
-                // Nombre exclusivo (bchangename=true, no pasa por GetSuppotType) para que el pdf de
-                // "carpeta soportes" (HC+SOP) nunca coincida con el nombre que genera el flujo anterior
-                // (DB + SupportsPath) para esta misma factura, y así no se combinen en un solo archivo.
-                List<string> lcarpetasoportes = new List<string>();
-                lcarpetasoportes.AddRange(lHC);
-                lcarpetasoportes.AddRange(lSOP);
-                if (lcarpetasoportes.Count > 0)
-                {
-                    string ssoportename = $"SOPESPECIALES_800180553_SETT{sinvoice}";
-                    this.GeneratePDFSupport(ssoportename, lcarpetasoportes, string.Empty, sinvoice, sdestinationpath, true);
-                }
+                this.GeneratePDFSupport(string.Empty, lHC, scodehc, sinvoice, sdestinationpath);
             }
-            else
+            if (lSOP.Count > 0)
             {
-                // Empresas con soporte unificado: por diseño, todo (flujo anterior + planes especiales)
-                // se combina intencionalmente en un solo "Soporte".
-                if (lHC.Count > 0)
-                {
-                    this.GeneratePDFSupport(string.Empty, lHC, "Soporte", sinvoice, sdestinationpath);
-                }
-                if (lSOP.Count > 0)
-                {
-                    this.GeneratePDFSupport(string.Empty, lSOP, "Soporte", sinvoice, sdestinationpath);
-                }
+                this.GeneratePDFSupport(string.Empty, lSOP, scodesop, sinvoice, sdestinationpath);
             }
         }
 
