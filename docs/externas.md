@@ -113,6 +113,16 @@ Las siguientes tienen integración en `Trazabilidad/` pero sin batch dedicado (g
 
 ---
 
+## Recursos de red compartidos
+
+### `\\Loki2\BACKUP\SOPORTES` — soportes de planes especiales en desmaterialización
+- **Uso:** `Trazabilidad\clases\Facturacion2885.GenerateSpecialPlanSupports()` — para facturas cuyo plan (`splan`) está en la lista `PlanesProgramasEspeciales` del config, busca ahí los archivos HC (Historia Clínica) y SOP (Soporte Clínico) por número de cita, con fallback por documento+mes.
+- **Config key:** `SupportsSpecialPlansPath`
+- **Requiere impersonación:** el Application Pool de `Trazabilidad` corre como `ApplicationPoolIdentity` (cuenta local sin credenciales de red), así que el acceso a este share **depende** de que `Trazabilidad\web.config` tenga `<identity impersonate="true" userName="fnc\vidar" password="..." />` con una contraseña vigente. Si `impersonate="false"` o la contraseña de `fnc\vidar` está desactualizada, cualquier factura de plan especial falla con `UnauthorizedAccessException` (aislado por factura en `errorlog.txt` desde 2026-09-11, antes abortaba toda la relación — ver `docs/decisiones.md`).
+- **Diagnóstico rápido:** `net use \\Loki2\BACKUP\SOPORTES /user:fnc\vidar <password>` desde una consola en el servidor confirma si la cuenta tiene acceso, sin pasar por IIS.
+
+---
+
 ## Herramientas de transferencia
 
 ### WinSCP

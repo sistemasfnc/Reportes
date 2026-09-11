@@ -112,7 +112,18 @@ namespace Trazabilidad.clases
             {
                 sfilename.Append(this.GetInvoiceName(item.invoice));
                 sfilename.Append(".PDF");
-                this.ProccessFiles(item.invoice, item.file, sfilename.ToString(), ldesmaterializacion);
+                try
+                {
+                    this.ProccessFiles(item.invoice, item.file, sfilename.ToString(), ldesmaterializacion);
+                }
+                catch (Exception ex)
+                {
+                    LogError.WriteError("Trazabilidad", "Trazabilidad", ex);
+                    var litem = ldesmaterializacion.Where(z => z.sfactura == item.invoice).ToList();
+                    string sdocumentos = string.Join(",", litem.Select(z => z.sdocumento).Distinct());
+                    string scups = string.Join(",", litem.Select(z => z.scups).Distinct());
+                    this.lerror.AppendLine($"No se pudieron generar los archivos de la factura SETT{item.invoice} (documento: {sdocumentos}, cups: {scups}): {ex.Message}");
+                }
                 sfilename.Clear();
             }
             if (this.scompany.EqualsOfAny("44"))
