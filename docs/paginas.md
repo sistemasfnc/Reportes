@@ -94,7 +94,7 @@ El sistema usa ASP.NET WebForms — no hay controllers REST. Cada página `.aspx
 | `CostoXMedico.aspx` | [POR CONFIRMAR] | Costos por médico |
 | `AsignarCentros.aspx` | [POR CONFIRMAR] | Asignación de centros de costo |
 | `CargarValoraciones.aspx` | [POR CONFIRMAR] | Carga de valoraciones |
-| `GeneraPlantillaProgramas.aspx` | [POR CONFIRMAR] | Plantilla de programas |
+| `GeneraPlantillaProgramas.aspx` | `createadmission` | Genera el Excel `planillaprogramas.xlsx` de programas (fecha inicial/final, convenio, programa, ¿tiene valoraciones?). Lee la vista Oracle `VDATOSPROGRAMAS` (o `VDATOSVALORACIONPROGRAMAS`) vía `FacadeStatistics.GetProgramsData` (`FNCESB\FNCDAC\Statistic.cs`) con la conexión `ServinteIntegra`. **No genera datos:** solo consulta lo que ya cargó `FNCCargoProgramas.exe` — ver [docs/batch.md](batch.md) → "FNCCargoProgramas". Si el Excel sale solo con encabezados, la vista no tiene filas para ese rango: revisar primero si el proceso de carga corrió. |
 
 ### EPS Especiales
 | Página | Descripción |

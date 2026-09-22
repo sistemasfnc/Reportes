@@ -1952,6 +1952,7 @@ namespace Trazabilidad.clases
                     sinvoive = x.sfactura,
                     scita = x.sapcita,
                     sdocument = x.sdocumento,
+                    scups = x.scups,
                     sadmissiondate = x.sfechaingreso
                 }
             )
@@ -1970,6 +1971,7 @@ namespace Trazabilidad.clases
                     chapter = y.Key.singreso,
                     cita = y.First().scita,
                     document = y.First().sdocument,
+                    cups = string.Join(",", y.Select(z => z.scups).Distinct()),
                     admissiondate = y.First().sadmissiondate
                 }
             ).ToList();
@@ -2003,11 +2005,11 @@ namespace Trazabilidad.clases
 
                 if (litemHC.Count == 0)
                 {
-                    this.lerror.AppendLine($"No se encontró archivo HC para el ingreso {item.chapter} de la factura SETT{sinvoice}");
+                    this.lerror.AppendLine($"No se encontró archivo HC para el ingreso {item.chapter} de la factura SETT{sinvoice} (documento: {item.document}, cups: {item.cups})");
                 }
                 if (litemSOP.Count == 0)
                 {
-                    this.lerror.AppendLine($"No se encontró archivo SOP para el ingreso {item.chapter} de la factura SETT{sinvoice}");
+                    this.lerror.AppendLine($"No se encontró archivo SOP para el ingreso {item.chapter} de la factura SETT{sinvoice} (documento: {item.document}, cups: {item.cups})");
                 }
 
                 lHC.AddRange(litemHC);
