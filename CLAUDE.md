@@ -141,23 +141,50 @@ La validación funcional es manual vía IIS o IIS Express (ver `pruebas.md` cent
 
 ## INSTRUCCIONES DE MANTENIMIENTO — leer y respetar siempre
 
+**0. Inicio de un requerimiento nuevo** (antes de empezar algo que no es
+continuar lo que ya estaba anotado en "Requerimiento en curso"):
+Buscá si ya existe un pendiente para esto en GestorPendientes (proyecto
+`BusDatos` — Reportes y FNCESB comparten ese nombre ahí):
+```
+python "C:\www\Pedro_Romero\Proyectos\Proyectos_Python\Desktop\pendientes-manager\pendientes_cli.py" listar --proyecto "BusDatos"
+python "C:\www\Pedro_Romero\Proyectos\Proyectos_Python\Desktop\pendientes-manager\pendientes_cli.py" buscar --proyecto "BusDatos" --texto "<término>"
+```
+Buscar por una sola palabra clave no alcanza: el mismo pedido puede estar escrito distinto (p. ej. "cesión de uso de imagen" vs. "material audiovisual"). Primero `listar` y leé los títulos de todos los pendientes abiertos (ignorá los `[resuelto]`); complementá con `buscar` usando varios términos y sinónimos; compará por significado, leé el detalle con `ver <id>` y, ante la duda, preguntale al usuario antes de crear uno nuevo.
+Si aparece uno que coincide, tomá su id (columna "#<id>"); si no, creálo:
+```
+python ".../pendientes_cli.py" crear --proyecto "BusDatos" --texto "<título corto>" --estado gestionado --subestado en_el_momento
+```
+Anotá el id en "Requerimiento en curso", línea propia: `Pendiente GestorPendientes: #<id>`.
+
 **1. Punto de control** (usar al cerrar una sesión intermedia de un requerimiento):
-Cuando el usuario diga "punto de control", actualiza la sección "Requerimiento en curso" de este archivo con: qué se está implementando, qué ya está hecho (con archivos modificados), cuál es el siguiente paso exacto, contexto importante que no está en el código, y si se escribieron pruebas, cuáles y qué cubren.
+Cuando el usuario diga "punto de control", actualiza la sección "Requerimiento en curso" de este archivo con: qué se está implementando, qué ya está hecho (con archivos modificados), cuál es el siguiente paso exacto, contexto importante que no está en el código, y si se escribieron pruebas, cuáles y qué cubren. Conservá la línea `Pendiente GestorPendientes: #<id>` tal cual estaba.
 
 **2. Retomar sesión** (usar al iniciar una sesión nueva):
-Cuando el usuario diga "retomar", lee la sección "Requerimiento en curso" y resume en 3 líneas dónde estamos y cuál es el siguiente paso.
+Cuando el usuario diga "retomar", lee la sección "Requerimiento en curso" y resume en 3 líneas dónde estamos y cuál es el siguiente paso. Si está vacía, es un requerimiento nuevo — aplicá el paso 0 antes de arrancar.
 
 **3. Cierre de requerimiento** (usar al terminar un requerimiento completo):
-Cuando el usuario diga "cerrar requerimiento", hacer en orden, todo sobre los
-archivos en `Centralización_Documentación\Proyectos\BusDatos\docs\Reportes\`
-(no en este repositorio):
+Cuando el usuario diga "cerrar requerimiento", hacer en orden. Los pasos
+a/c/d/e son sobre archivos en
+`Centralización_Documentación\Proyectos\BusDatos\docs\Reportes\`
+(no en este repositorio); el paso b es sobre este mismo CLAUDE.md:
    a. Agregar una entrada completa a `historial.md` con: fecha de hoy, título corto del requerimiento, qué se implementó, archivos modificados, decisiones tomadas que no son obvias, pruebas escritas (qué clases/módulos y qué escenarios cubren), y si quedó algo pendiente.
    b. Actualizar "Últimos cambios" en este archivo (`CLAUDE.md`, que sí queda en este repositorio): agregar la entrada nueva resumida en 1 línea; si ya hay 3 entradas, eliminar la más antigua.
    c. Actualizar `pruebas.md`: agregar las clases o módulos nuevos a "Qué se prueba en este proyecto", y agregar una entrada al "Historial de cobertura" con fecha, qué se cubrió y por qué.
    d. Si el requerimiento implicó una decisión técnica no obvia, agregar una entrada a `decisiones.md`.
    e. Si el requerimiento afectó endpoints, dominio, flujos o integraciones, actualizar el archivo correspondiente en ese mismo `docs\Reportes\`.
-   f. Si quedó algo pendiente, registrarlo en `Centralización_Documentación\Pendientes.md` (sección del proyecto).
-   g. Borrar el contenido de "Requerimiento en curso" y dejarlo como (vacío).
+   f. Borrar el contenido de "Requerimiento en curso" y dejarlo como (vacío).
+   g. Marcá el pendiente de GestorPendientes como resuelto, con el id anotado en el paso 0/1:
+```
+python "C:\www\Pedro_Romero\Proyectos\Proyectos_Python\Desktop\pendientes-manager\pendientes_cli.py" resolver <id>
+```
+      Si no hay id anotado, no inventes uno — creá el pendiente directo ya resuelto:
+```
+python ".../pendientes_cli.py" crear --proyecto "BusDatos" --texto "<título corto>" --estado resuelto
+```
+   h. Si en (a) identificaste trabajo que quedó pendiente y no es ya un pendiente existente en GestorPendientes, creálo sin pedir permiso (reemplaza el registrarlo a mano en `Pendientes.md` — ese archivo ya no se edita directo, ver "Documentación completa" arriba):
+```
+python ".../pendientes_cli.py" crear --proyecto "BusDatos" --texto "<qué quedó por hacer>" --estado pendiente --subestado backlog_general
+```
 
 **4. Escribir pruebas** (comportamiento estándar siempre, adoptado 2026-07-08):
 Cuando se implemente o modifique lógica de negocio, sin que el usuario tenga que pedirlo explícitamente:
