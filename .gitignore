@@ -253,3 +253,9 @@ Config/
 
 appsettings.Development.json
 appsettings.Local.json
+
+# =====================================================================
+# ARCHIVOS DE ACCESO SERVIDOR
+# =====================================================================
+
+acceso/
