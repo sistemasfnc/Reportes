@@ -185,6 +185,7 @@ python ".../pendientes_cli.py" crear --proyecto "BusDatos" --texto "<título cor
 ```
 python ".../pendientes_cli.py" crear --proyecto "BusDatos" --texto "<qué quedó por hacer>" --estado pendiente --subestado backlog_general
 ```
+   i. **Commit final** (sin push, salvo que el usuario lo pida): commitear los cambios del requerimiento más este `CLAUDE.md`, agregando los archivos **por nombre** (nunca `git add -A`) y sin arrastrar cambios ajenos previos que ya estuvieran en el working tree (ej. `.gitignore`). Usar la convención de commits del repo (`fix:`, `docs:`, etc.) y la atribución Co-Authored-By.
 
 **4. Escribir pruebas** (comportamiento estándar siempre, adoptado 2026-07-08):
 Cuando se implemente o modifique lógica de negocio, sin que el usuario tenga que pedirlo explícitamente:
