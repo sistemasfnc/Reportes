@@ -133,9 +133,9 @@ La validación funcional es manual vía IIS o IIS Express (ver `pruebas.md` cent
 
 (máximo 3 entradas, el historial completo está en `historial.md` centralizado)
 
+- 2026-10-01 — Soportes de programas especiales (Facturacion2885) por documento del paciente + mes de la factura, sin búsqueda por cita
 - 2026-09-22 — Documento/cups en log de soportes faltantes de planes especiales (Facturacion2885) + documentación del proceso externo FNCCargoProgramas tras caída de servidores
 - 2026-09-11 — Investigación de soporte clínico faltante (relación 28830) + cadena de incidentes de entorno local (IIS/Config.dll/impersonación Loki2) + aislamiento de errores por factura en GenerateFiles
-- 2026-08-02 — Un solo HEV por factura Sanitas, sin sufijo de cédula (Facturacion2885); commit sin push por permiso denegado a DevNeumo
 
 ---
 

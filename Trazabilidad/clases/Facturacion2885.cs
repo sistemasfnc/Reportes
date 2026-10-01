@@ -1938,78 +1938,51 @@ namespace Trazabilidad.clases
         /// <summary>
         /// Busca los soportes (HC y SOP) de facturas con plan de programa especial en \\Loki2\BACKUP\SOPORTES,
         /// ya que para estos planes el soporte no se genera desde la base de datos como en el flujo normal.
-        /// Nombre de archivo esperado: {documento}_{fechaingreso YYYYMMDD}_{cita sin guion}_{consecutivo}_{HC|SOP}.pdf
+        /// Las facturas de estos programas se soportan con todas las atenciones del paciente durante el mes en que
+        /// se generó la factura: se busca por documento del paciente y año/mes de la factura, sin importar si la
+        /// cita de la atención está relacionada en la factura.
+        /// Nombre de archivo esperado: {documento}_{fecha YYYYMMDD}_{cita sin guion}_{consecutivo}_{HC|SOP}.pdf
         /// </summary>
         private void GenerateSpecialPlanSupports(List<Desmaterializacion> ldesmaterializacion, string sinvoice, string sdestinationpath = "")
         {
             string ssupportsfolder = Configuration.GetStringValue("SupportsSpecialPlansPath");
             List<string> lallfiles = Directory.GetFiles(ssupportsfolder).ToList();
-            var tmp = ldesmaterializacion.Where(z => z.sfactura == sinvoice).Select
-            (
-                x => new
-                {
-                    singreso = x.singreso,
-                    sinvoive = x.sfactura,
-                    scita = x.sapcita,
-                    sdocument = x.sdocumento,
-                    scups = x.scups,
-                    sadmissiondate = x.sfechaingreso
-                }
-            )
-            .GroupBy
-            (
-                x => new
-                {
-                    x.singreso,
-                    x.sinvoive
-                }
-            )
-            .Select
-            (
-                y => new
-                {
-                    chapter = y.Key.singreso,
-                    cita = y.First().scita,
-                    document = y.First().sdocument,
-                    cups = string.Join(",", y.Select(z => z.scups).Distinct()),
-                    admissiondate = y.First().sadmissiondate
-                }
-            ).ToList();
+            List<Desmaterializacion> linvoice = ldesmaterializacion.Where(z => z.sfactura == sinvoice).ToList();
+            string sinvoicedate = linvoice.Select(z => z.sfechafactura).FirstOrDefault(d => !string.IsNullOrWhiteSpace(d));
+            string syearmonth = this.GetYearMonth(sinvoicedate);
+            if (string.IsNullOrEmpty(syearmonth))
+            {
+                this.lerror.AppendLine($"No se pudo determinar el mes de la factura SETT{sinvoice} (fecha de factura: '{sinvoicedate}'), no se buscaron soportes de programa especial");
+                return;
+            }
+
+            var lpatients = linvoice
+                .Where(x => !string.IsNullOrWhiteSpace(x.sdocumento))
+                .GroupBy(x => x.sdocumento.Trim())
+                .Select
+                (
+                    y => new
+                    {
+                        document = y.Key,
+                        cups = string.Join(",", y.Select(z => z.scups).Distinct())
+                    }
+                ).ToList();
 
             List<string> lHC = new List<string>();
             List<string> lSOP = new List<string>();
-            foreach (var item in tmp)
+            foreach (var item in lpatients)
             {
-                string scitaclean = (item.cita ?? string.Empty).Replace("-", string.Empty);
-                bool bcitavalida = !string.IsNullOrEmpty(scitaclean) && scitaclean != "0";
-                string scitatoken = $"_{scitaclean}_";
-                List<string> litemHC = bcitavalida ? lallfiles.Where(f => ContainsCitaAndIsType(f, scitatoken, false)).ToList() : new List<string>();
-                List<string> litemSOP = bcitavalida ? lallfiles.Where(f => ContainsCitaAndIsType(f, scitatoken, true)).ToList() : new List<string>();
-
-                if (litemHC.Count == 0 || litemSOP.Count == 0)
-                {
-                    string syearmonth = (item.admissiondate != null && item.admissiondate.Length >= 6) ? item.admissiondate.Substring(0, 6) : string.Empty;
-                    if (!string.IsNullOrEmpty(syearmonth) && !string.IsNullOrEmpty(item.document))
-                    {
-                        string sdocmonth = $"{item.document}_{syearmonth}";
-                        if (litemHC.Count == 0)
-                        {
-                            litemHC = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, false)).ToList();
-                        }
-                        if (litemSOP.Count == 0)
-                        {
-                            litemSOP = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, true)).ToList();
-                        }
-                    }
-                }
+                string sdocmonth = $"{item.document}_{syearmonth}";
+                List<string> litemHC = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, false)).OrderBy(f => Path.GetFileName(f), StringComparer.OrdinalIgnoreCase).ToList();
+                List<string> litemSOP = lallfiles.Where(f => StartsWithDocMonthAndIsType(f, sdocmonth, true)).OrderBy(f => Path.GetFileName(f), StringComparer.OrdinalIgnoreCase).ToList();
 
                 if (litemHC.Count == 0)
                 {
-                    this.lerror.AppendLine($"No se encontró archivo HC para el ingreso {item.chapter} de la factura SETT{sinvoice} (documento: {item.document}, cups: {item.cups})");
+                    this.lerror.AppendLine($"No se encontró archivo HC del paciente {item.document} en el mes {syearmonth} de la factura SETT{sinvoice} (cups: {item.cups})");
                 }
                 if (litemSOP.Count == 0)
                 {
-                    this.lerror.AppendLine($"No se encontró archivo SOP para el ingreso {item.chapter} de la factura SETT{sinvoice} (documento: {item.document}, cups: {item.cups})");
+                    this.lerror.AppendLine($"No se encontró archivo SOP del paciente {item.document} en el mes {syearmonth} de la factura SETT{sinvoice} (cups: {item.cups})");
                 }
 
                 lHC.AddRange(litemHC);
@@ -2029,24 +2002,35 @@ namespace Trazabilidad.clases
         }
 
         /// <summary>
-        /// Indica si el nombre de archivo contiene el token de cita (ej. "_AP0047553679_") y corresponde al tipo pedido.
-        /// Los HC terminan limpio en "_HC.pdf"; los SOP traen sufijo adicional después de "_SOP" (ej. "_SOP_documento_fecha_..pdf").
+        /// Convierte la fecha de la factura (texto que llega de la vista) en año y mes con formato yyyyMM.
+        /// Devuelve vacío si la fecha no se puede interpretar.
         /// </summary>
-        private static bool ContainsCitaAndIsType(string filepath, string scitatoken, bool bissop)
+        private string GetYearMonth(string sdate)
         {
-            string fname = Path.GetFileName(filepath);
-            if (fname.IndexOf(scitatoken, StringComparison.OrdinalIgnoreCase) < 0)
+            if (string.IsNullOrWhiteSpace(sdate))
             {
-                return false;
+                return string.Empty;
             }
-            return bissop
-                ? fname.IndexOf("_SOP", StringComparison.OrdinalIgnoreCase) >= 0 && fname.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)
-                : fname.EndsWith("_HC.pdf", StringComparison.OrdinalIgnoreCase);
+            string[] aformats = new string[]
+            {
+                "yyyyMMdd", "yyyy-MM-dd", "yyyyMMddHHmmss", "yyyy-MM-dd HH:mm:ss",
+                "dd/MM/yyyy", "d/M/yyyy", "dd/MM/yyyy HH:mm:ss", "d/M/yyyy H:mm:ss",
+                "dd/MM/yyyy hh:mm:ss tt", "d/M/yyyy h:mm:ss tt", "dd-MMM-yy", "dd-MMM-yyyy"
+            };
+            DateTime dtdate;
+            var invariant = System.Globalization.CultureInfo.InvariantCulture;
+            if (DateTime.TryParseExact(sdate.Trim(), aformats, invariant, System.Globalization.DateTimeStyles.None, out dtdate)
+                || DateTime.TryParse(sdate.Trim(), new System.Globalization.CultureInfo("es-CO"), System.Globalization.DateTimeStyles.None, out dtdate))
+            {
+                return dtdate.ToString("yyyyMM");
+            }
+            return string.Empty;
         }
 
         /// <summary>
-        /// Fallback por documento+año/mes: el nombre debe iniciar con "{documento}_{yyyyMM}", seguido de exactamente
-        /// 2 dígitos de día y un guion bajo, y luego corresponder al tipo pedido (mismo criterio que ContainsCitaAndIsType).
+        /// Indica si el nombre de archivo corresponde al tipo pedido y al documento+año/mes: debe iniciar con
+        /// "{documento}_{yyyyMM}", seguido de exactamente 2 dígitos de día y un guion bajo. Los HC terminan limpio
+        /// en "_HC.pdf"; los SOP traen sufijo adicional después de "_SOP" (ej. "_SOP_documento_fecha_..pdf").
         /// </summary>
         private static bool StartsWithDocMonthAndIsType(string filepath, string sdocmonth, bool bissop)
         {
